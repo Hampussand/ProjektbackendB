@@ -62,7 +62,9 @@ public class AddressesDbRepos
         IQueryable<AddressDbM> query;
         if (flat)
         {
-            query = _dbContext.Addresses.AsNoTracking();
+            // For lightweight list reads, include Friends but do not include Pets/Quotes
+            query = _dbContext.Addresses.AsNoTracking()
+                .Include(i => i.FriendsDbM);
         }
         else
         {

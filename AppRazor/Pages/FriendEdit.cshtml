@@ -1,0 +1,280 @@
+@page
+@model ProjectB_GoodFriends.Pages.FriendEditModel
+@{
+    ViewData["Title"] = "Edit Friend";
+}
+
+<div class="container mt-5">
+    <h1 class="mb-4">Edit Friend</h1>
+
+    @if (Model.Friends != null && Model.Friends.Any())
+    {
+        <div class="accordion" id="friendsAccordion">
+            @foreach (var friend in Model.Friends)
+            {
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="heading-@friend.FriendId">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" 
+                                data-bs-target="#collapse-@friend.FriendId" aria-expanded="false" 
+                                aria-controls="collapse-@friend.FriendId">
+                            <strong>@friend.FirstName @friend.LastName</strong>
+                            <span class="ms-2 text-muted">(@friend.Email)</span>
+                        </button>
+                    </h2>
+                    <div id="collapse-@friend.FriendId" class="accordion-collapse collapse" 
+                         aria-labelledby="heading-@friend.FriendId" data-bs-parent="#friendsAccordion">
+                        <div class="accordion-body">
+                            <form method="post" asp-page-handler="UpdateFriend" class="needs-validation" novalidate>
+                                <input type="hidden" name="friendId" value="@friend.FriendId" />
+                                <div class="mb-3">
+                                    <label for="firstName-@friend.FriendId" class="form-label">First Name</label>
+                                    <input type="text" class="form-control" id="firstName-@friend.FriendId" 
+                                           name="firstName" value="@friend.FirstName" required
+                                           pattern="[a-zA-Z0-9\s]*"
+                                           title="First name can only contain letters, numbers, and spaces" />
+                                    <div class="invalid-feedback">First name is required and can only contain letters, numbers, and spaces.</div>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="lastName-@friend.FriendId" class="form-label">Last Name</label>
+                                    <input type="text" class="form-control" id="lastName-@friend.FriendId" 
+                                           name="lastName" value="@friend.LastName" required
+                                           pattern="[a-zA-Z0-9\s]*"
+                                           title="Last name can only contain letters, numbers, and spaces" />
+                                    <div class="invalid-feedback">Last name is required and can only contain letters, numbers, and spaces.</div>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="email-@friend.FriendId" class="form-label">Email</label>
+                                    <input type="email" class="form-control" id="email-@friend.FriendId" 
+                                           name="email" value="@friend.Email" required />
+                                    <div class="invalid-feedback">Please provide a valid email address.</div>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="birthday-@friend.FriendId" class="form-label">Birthday</label>
+                                    <input type="date" class="form-control" id="birthday-@friend.FriendId" 
+                                           name="birthday" value="@(friend.Birthday.HasValue ? friend.Birthday.Value.ToString("yyyy-MM-dd") : "")"
+                                           max="@DateTime.Now.ToString("yyyy-MM-dd")" />
+                                    <div class="invalid-feedback">Birthday must be a valid date in the past.</div>
+                                    <small class="form-text text-muted">Optional field. Leave blank if not applicable.</small>
+                                </div>
+                                <div class="mb-3">
+                                    <h5>Address</h5>
+                                    @if (friend.Address != null)
+                                    {
+                                        <div class="mb-3">
+                                            <label for="streetAddress-@friend.FriendId" class="form-label">Street Address</label>
+                                            <input type="text" class="form-control" id="streetAddress-@friend.FriendId" 
+                                                   name="streetAddress" value="@friend.Address.StreetAddress"
+                                                   pattern="[a-zA-Z0-9\s]*"
+                                                   title="Street address can only contain letters, numbers, and spaces" />
+                                            <div class="invalid-feedback">Street address can only contain letters, numbers, and spaces.</div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-6 mb-3">
+                                                <label for="city-@friend.FriendId" class="form-label">City</label>
+                                                <input type="text" class="form-control" id="city-@friend.FriendId" 
+                                                       name="city" value="@friend.Address.City"
+                                                       pattern="[a-zA-Z0-9\s]*"
+                                                       title="City can only contain letters, numbers, and spaces" />
+                                                <div class="invalid-feedback">City can only contain letters, numbers, and spaces.</div>
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <label for="zipCode-@friend.FriendId" class="form-label">Zip Code</label>
+                                                <input type="number" class="form-control" id="zipCode-@friend.FriendId" 
+                                                       name="zipCode" value="@friend.Address.ZipCode" />
+                                                <div class="invalid-feedback">Please provide a valid zip code.</div>
+                                            </div>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="country-@friend.FriendId" class="form-label">Country</label>
+                                            <input type="text" class="form-control" id="country-@friend.FriendId" 
+                                                   name="country" value="@friend.Address.Country"
+                                                   pattern="[a-zA-Z0-9\s]*"
+                                                   title="Country can only contain letters, numbers, and spaces" />
+                                            <div class="invalid-feedback">Country can only contain letters, numbers, and spaces.</div>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <em>No address on file</em>
+                                    }
+                                </div>
+                                <div class="mb-3">
+                                    <h5>Pets</h5>
+                                    @if (friend.Pets != null && friend.Pets.Any())
+                                    {
+                                        <ul class="list-group">
+                                            @foreach (var pet in friend.Pets)
+                                            {
+                                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                                    <div>
+                                                        <strong>@pet.Name</strong> - @pet.Kind
+                                                    </div>
+                                                    <button type="button" class="btn btn-sm btn-danger" 
+                                                            data-bs-toggle="modal" 
+                                                            data-bs-target="#deletePetModal"
+                                                            data-pet-id="@pet.PetId"
+                                                            data-pet-name="@pet.Name">
+                                                        Delete
+                                                    </button>
+                                                </li>
+                                            }
+                                        </ul>
+                                    }
+                                    else
+                                    {
+                                        <em>No pets on file</em>
+                                    }
+                                </div>
+                                <div class="mb-3">
+                                    <h5>Quotes</h5>
+                                    @if (friend.Quotes != null && friend.Quotes.Any())
+                                    {
+                                        <ul class="list-group">
+                                            @foreach (var quote in friend.Quotes)
+                                            {
+                                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                                    <div>
+                                                        <em>"@quote.QuoteText"</em> - @quote.Author
+                                                    </div>
+                                                    <button type="button" class="btn btn-sm btn-danger" 
+                                                            data-bs-toggle="modal" 
+                                                            data-bs-target="#deleteQuoteModal"
+                                                            data-quote-id="@quote.QuoteId"
+                                                            data-quote-text="@quote.QuoteText">
+                                                        Delete
+                                                    </button>
+                                                </li>
+                                            }
+                                        </ul>
+                                    }
+                                    else
+                                    {
+                                        <em>No quotes on file</em>
+                                    }
+                                </div>
+                                <div class="mb-3">
+                                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                                    <a href="/FriendDetails" class="btn btn-secondary">Cancel</a>
+                                </div>
+
+                                @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+                                {
+                                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                        @Model.ErrorMessage
+                                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                    </div>
+                                }
+
+                                @if (!string.IsNullOrEmpty(Model.SuccessMessage))
+                                {
+                                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                                        @Model.SuccessMessage
+                                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                    </div>
+                                }
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <p class="alert alert-info">No friends found.</p>
+    }
+</div>
+
+<style>
+    .accordion-button:not(.collapsed) {
+        box-shadow: none;
+    }
+
+    .accordion-button:focus {
+        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+    }
+</style>
+<div class="modal fade" id="deletePetModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Delete Pet</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete <strong id="petNameDisplay"></strong>?</p>
+                <p class="text-danger">This action cannot be undone.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <form method="post" asp-page-handler="DeletePet" style="display: inline;">
+                    <input type="hidden" id="deletePetId" name="petId" />
+                    <button type="submit" class="btn btn-danger">Delete Pet</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="deleteQuoteModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Delete Quote</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete this quote?</p>
+                <p><em id="quoteTextDisplay"></em></p>
+                <p class="text-danger">This action cannot be undone.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <form method="post" asp-page-handler="DeleteQuote" style="display: inline;">
+                    <input type="hidden" id="deleteQuoteId" name="quoteId" />
+                    <button type="submit" class="btn btn-danger">Delete Quote</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const deletePetModal = document.getElementById('deletePetModal');
+    if (deletePetModal) {
+        deletePetModal.addEventListener('show.bs.modal', event => {
+            const button = event.relatedTarget;
+            const petId = button.getAttribute('data-pet-id');
+            const petName = button.getAttribute('data-pet-name');
+            
+            document.getElementById('deletePetId').value = petId;
+            document.getElementById('petNameDisplay').textContent = petName;
+        });
+    }
+    const deleteQuoteModal = document.getElementById('deleteQuoteModal');
+    if (deleteQuoteModal) {
+        deleteQuoteModal.addEventListener('show.bs.modal', event => {
+            const button = event.relatedTarget;
+            const quoteId = button.getAttribute('data-quote-id');
+            const quoteText = button.getAttribute('data-quote-text');
+            
+            document.getElementById('deleteQuoteId').value = quoteId;
+            document.getElementById('quoteTextDisplay').textContent = '"' + quoteText + '"';
+        });
+    }
+    (function () {
+        'use strict';
+        window.addEventListener('load', function () {
+            var forms = document.querySelectorAll('.needs-validation');
+            Array.prototype.slice.call(forms)
+                .forEach(function (form) {
+                    form.addEventListener('submit', function (event) {
+                        if (!form.checkValidity()) {
+                            event.preventDefault();
+                            event.stopPropagation();
+                        }
+                        form.classList.add('was-validated');
+                    }, false);
+                });
+        }, false);
+    })();
+</script>

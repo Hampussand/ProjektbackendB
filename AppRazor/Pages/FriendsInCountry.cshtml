@@ -1,0 +1,47 @@
+@page
+@model ProjectB_GoodFriends.Pages.FriendsInCountryModel
+@{
+	ViewData["Title"] = "Friends Search";
+}
+
+<h1>Find Friends by Country or City</h1>
+
+<form method="get" class="mb-3">
+	<div class="input-group">
+		<select name="SearchBy" class="form-select" style="max-width:140px;">
+			<option value="Country" selected>Country</option>
+			<option value="City">City</option>
+		</select>
+		<input name="Query" value="@Model.Query" class="form-control" placeholder="Enter country or city..." />
+		<button class="btn btn-primary" type="submit">Search</button>
+	</div>
+	<div class="form-text mt-1">Leave empty to list all seeded friends.</div>
+</form>
+
+@if (Model.Friends != null && Model.Friends.Any())
+{
+	<div class="list-group">
+		@foreach (var friend in Model.Friends)
+		{
+			<div class="list-group-item mb-2">
+				<div><strong>@(friend.FirstName) @(friend.LastName)</strong></div>
+				<div class="text-muted">@friend.Address?.City, @friend.Address?.Country</div>
+				@if (friend.Pets != null && friend.Pets.Any())
+				{
+					<div>Pets:
+						<ul class="mb-0">
+							@foreach (var pet in friend.Pets)
+							{
+								<li>@pet.Name (@pet.Kind)</li>
+							}
+						</ul>
+					</div>
+				}
+			</div>
+		}
+	</div>
+}
+else
+{
+	<p>No friends found.</p>
+}

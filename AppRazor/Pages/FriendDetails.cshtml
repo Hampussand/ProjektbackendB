@@ -1,0 +1,108 @@
+@page
+@model ProjectB_GoodFriends.Pages.FriendDetailsModel
+@{
+    ViewData["Title"] = "Friend Details";
+}
+
+<div class="container mt-5">
+    <h1 class="mb-4">Friend Details</h1>
+
+    @if (Model.Friends != null && Model.Friends.Any())
+    {
+        <div class="accordion" id="friendsAccordion">
+            @foreach (var friend in Model.Friends)
+            {
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="heading-@friend.FriendId">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" 
+                                data-bs-target="#collapse-@friend.FriendId" aria-expanded="false" 
+                                aria-controls="collapse-@friend.FriendId">
+                            <strong>@friend.FirstName @friend.LastName</strong>
+                            <span class="ms-2 text-muted">(@friend.Email)</span>
+                        </button>
+                    </h2>
+                    <div id="collapse-@friend.FriendId" class="accordion-collapse collapse" 
+                         aria-labelledby="heading-@friend.FriendId" data-bs-parent="#friendsAccordion">
+                        <div class="accordion-body">
+                            @if (friend.Birthday.HasValue)
+                            {
+                                <div class="mb-3">
+                                    <strong>Birthday:</strong> @friend.Birthday.Value.ToString("MMMM dd, yyyy")
+                                </div>
+                            }
+                            <div class="mb-3">
+                                <h5>Address</h5>
+                                @if (friend.Address != null)
+                                {
+                                    <p class="mb-1">
+                                        @friend.Address.StreetAddress
+                                    </p>
+                                    <p class="mb-1">
+                                        @friend.Address.City, @friend.Address.ZipCode
+                                    </p>
+                                    <p>
+                                        @friend.Address.Country
+                                    </p>
+                                }
+                                else
+                                {
+                                    <em>No address on file</em>
+                                }
+                            </div>
+                            <div class="mb-3">
+                                <h5>Pets</h5>
+                                @if (friend.Pets != null && friend.Pets.Any())
+                                {
+                                    <ul class="list-group">
+                                        @foreach (var pet in friend.Pets)
+                                        {
+                                            <li class="list-group-item">
+                                                <strong>@pet.Name</strong> - @pet.Kind
+                                            </li>
+                                        }
+                                    </ul>
+                                }
+                                else
+                                {
+                                    <em>No pets on file</em>
+                                }
+                            </div>
+                            <div class="mb-3">
+                                <h5>Quotes</h5>
+                                @if (friend.Quotes != null && friend.Quotes.Any())
+                                {
+                                    <ul class="list-group">
+                                        @foreach (var quote in friend.Quotes)
+                                        {
+                                            <li class="list-group-item">
+                                                <em>"@quote.QuoteText"</em> - @quote.Author
+                                            </li>
+                                        }
+                                    </ul>
+                                }
+                                else
+                                {
+                                    <em>No quotes on file</em>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <p class="alert alert-info">No friends found.</p>
+    }
+</div>
+
+<style>
+    .accordion-button:not(.collapsed) {
+        box-shadow: none;
+    }
+
+    .accordion-button:focus {
+        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+    }
+</style>
